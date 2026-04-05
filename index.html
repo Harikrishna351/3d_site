@@ -3,35 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JARVIS // Mark 47 Interface</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>JARVIS // Voice Debug Interface</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
-        }
-
-        :root {
-            --jarvis-blue: #00d4ff;
-            --jarvis-dark: #001f3f;
-            --jarvis-glow: rgba(0, 212, 255, 0.3);
-            --alert-orange: #ff9500;
-            --hud-bg: rgba(0, 20, 40, 0.85);
         }
 
         body {
             background: #000;
-            color: var(--jarvis-blue);
+            color: #00d4ff;
             font-family: 'Share Tech Mono', monospace;
-            overflow: hidden;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* Scan Lines & CRT Effect */
+        /* CRT Scan Lines */
         body::before {
             content: '';
             position: fixed;
@@ -39,145 +29,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                rgba(18, 16, 16, 0) 50%,
-                rgba(0, 0, 0, 0.25) 50%
-            );
+            background: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.25) 50%);
             background-size: 100% 4px;
             pointer-events: none;
             z-index: 9999;
-            animation: scanline 10s linear infinite;
         }
 
-        @keyframes scanline {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(10px); }
-        }
-
-        /* Three.js Background */
-        #space-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        /* Main HUD Container */
-        .hud-container {
-            position: relative;
-            z-index: 10;
-            height: 100vh;
+        .container {
             display: grid;
-            grid-template-columns: 250px 1fr 350px;
-            grid-template-rows: 80px 1fr 120px;
+            grid-template-columns: 1fr 400px;
+            height: 100vh;
             gap: 20px;
             padding: 20px;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
         }
 
-        /* Top Bar */
-        .top-bar {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--jarvis-blue);
-            padding-bottom: 10px;
-        }
-
-        .title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
-            font-weight: 900;
-            letter-spacing: 4px;
-            text-shadow: 0 0 20px var(--jarvis-blue);
-        }
-
-        .subtitle {
-            font-size: 12px;
-            opacity: 0.8;
-            letter-spacing: 2px;
-        }
-
-        .system-status {
-            display: flex;
-            gap: 30px;
-            font-size: 12px;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--jarvis-blue);
-            box-shadow: 0 0 10px var(--jarvis-blue);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Left Panel - System Diagnostics */
-        .left-panel {
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            background: var(--hud-bg);
-            backdrop-filter: blur(10px);
+        /* Main Interface */
+        .main-panel {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 20, 40, 0.8);
+            padding: 30px;
         }
 
-        .panel-title {
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
-            padding-bottom: 10px;
+            font-size: 36px;
+            text-shadow: 0 0 20px #00d4ff;
             margin-bottom: 10px;
         }
 
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            margin: 8px 0;
-        }
-
-        .metric-value {
-            color: #fff;
-            text-shadow: 0 0 5px var(--jarvis-blue);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(0, 212, 255, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--jarvis-blue);
-            width: 0%;
-            transition: width 0.5s;
-            box-shadow: 0 0 10px var(--jarvis-blue);
-        }
-
-        /* Center - Visualizer */
-        .center-panel {
+        /* Voice Core Visualizer */
+        .voice-core {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -185,840 +75,634 @@
             position: relative;
         }
 
-        .visualizer-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
+        .core-circle {
+            width: 250px;
+            height: 250px;
+            border: 3px solid #00d4ff;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s;
         }
 
-        #audio-visualizer {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 20;
+        .core-circle.listening {
+            border-color: #ff9500;
+            box-shadow: 0 0 80px rgba(255, 149, 0, 0.5);
+            animation: pulse-ring 1.5s infinite;
         }
 
-        .core-ring {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border: 2px solid var(--jarvis-blue);
-            border-radius: 50%;
-            animation: rotate 20s linear infinite;
-            box-shadow: 0 0 30px var(--jarvis-glow), inset 0 0 30px var(--jarvis-glow);
+        .core-circle.processing {
+            border-color: #00ff88;
+            animation: spin 2s linear infinite;
         }
 
-        .core-ring::before,
-        .core-ring::after {
-            content: '';
-            position: absolute;
-            border: 1px solid rgba(0, 212, 255, 0.5);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        @keyframes pulse-ring {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        .core-ring::before {
-            width: 220px;
-            height: 220px;
-            animation: rotate 15s linear infinite reverse;
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .core-ring::after {
-            width: 180px;
-            height: 180px;
-            border-style: dashed;
-            animation: rotate 10s linear infinite;
+        .mic-icon {
+            font-size: 80px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;
         }
 
-        @keyframes rotate {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
+        .mic-icon:hover {
+            transform: scale(1.1);
         }
 
-        .listening-indicator {
-            position: absolute;
-            bottom: -40px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 16px;
-            letter-spacing: 3px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            text-shadow: 0 0 10px var(--jarvis-blue);
+        .mic-icon.recording {
+            color: #ff9500;
+            animation: mic-pulse 1s infinite;
         }
 
-        .listening-indicator.active {
-            opacity: 1;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
+        @keyframes mic-pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.5; }
         }
 
-        .wake-word-hint {
-            position: absolute;
-            top: -60px;
-            font-size: 12px;
-            opacity: 0.6;
+        /* Audio Level Bars */
+        .audio-levels {
+            display: flex;
+            gap: 4px;
+            height: 60px;
+            align-items: flex-end;
+            margin-top: 30px;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 5px;
+        }
+
+        .level-bar {
+            width: 8px;
+            background: #00d4ff;
+            transition: height 0.05s;
+            border-radius: 2px;
+            opacity: 0.3;
+        }
+
+        .level-bar.active {
+            opacity: 1;
+            background: #ff9500;
+        }
+
+        /* Status Text */
+        .status-text {
+            margin-top: 20px;
+            font-size: 18px;
             text-align: center;
-            width: 100%;
+            min-height: 30px;
         }
 
-        /* Right Panel - Chat (FIXED SCROLLING) */
-        .right-panel {
+        .status-text.error {
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff4444;
+        }
+
+        .status-text.success {
+            color: #00ff88;
+        }
+
+        /* Debug Console */
+        .debug-panel {
             border: 1px solid rgba(0, 212, 255, 0.3);
             border-radius: 10px;
-            background: var(--hud-bg);
-            backdrop-filter: blur(10px);
+            background: rgba(0, 10, 20, 0.9);
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Critical for containment */
+            overflow: hidden;
         }
 
-        .chat-header {
+        .debug-header {
+            background: rgba(0, 212, 255, 0.1);
             padding: 15px;
-            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
             font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        /* CRITICAL FIX: Scrollable chat container */
-        .chat-messages {
+        .debug-log {
             flex: 1;
-            overflow-y: auto; /* Enables scrolling */
-            overflow-x: hidden;
+            overflow-y: auto;
             padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            scroll-behavior: smooth; /* Smooth scrolling */
+            font-size: 12px;
+            line-height: 1.6;
         }
 
-        /* Custom scrollbar */
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
+        .debug-log .error { color: #ff4444; }
+        .debug-log .info { color: #00d4ff; }
+        .debug-log .success { color: #00ff88; }
+        .debug-log .warn { color: #ffaa00; }
 
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: var(--jarvis-blue);
-            border-radius: 3px;
+        /* Chat Area */
+        .chat-area {
+            margin-top: 20px;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            padding-top: 20px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 200px;
         }
 
         .message {
-            max-width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 13px;
-            line-height: 1.4;
-            animation: messageSlide 0.3s ease-out;
-            word-wrap: break-word;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            animation: fadeIn 0.3s;
         }
 
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.jarvis {
-            background: rgba(0, 212, 255, 0.15);
-            border-left: 3px solid var(--jarvis-blue);
-            align-self: flex-start;
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 3px solid #00d4ff;
         }
 
         .message.user {
             background: rgba(255, 255, 255, 0.05);
-            border-right: 3px solid var(--alert-orange);
-            align-self: flex-end;
             text-align: right;
         }
 
-        .message-time {
-            font-size: 10px;
-            opacity: 0.5;
-            margin-top: 5px;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 5px;
-            padding: 15px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .typing-indicator.active {
-            opacity: 1;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--jarvis-blue);
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite;
-        }
-
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        /* Bottom Command Bar */
-        .bottom-bar {
-            grid-column: 1 / -1;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            border-top: 1px solid var(--jarvis-blue);
-            background: var(--hud-bg);
-            backdrop-filter: blur(10px);
-        }
-
-        .command-input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 25px;
-            padding: 15px 25px;
-            color: var(--jarvis-blue);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .command-input:focus {
-            border-color: var(--jarvis-blue);
-            box-shadow: 0 0 20px var(--jarvis-glow);
-        }
-
-        .command-input::placeholder {
-            color: rgba(0, 212, 255, 0.4);
-        }
-
-        .btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 1px solid var(--jarvis-blue);
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--jarvis-blue);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            background: var(--jarvis-blue);
-            color: #000;
-            box-shadow: 0 0 20px var(--jarvis-blue);
-        }
-
-        .btn.voice-btn.recording {
-            background: var(--alert-orange);
-            border-color: var(--alert-orange);
-            color: #000;
-            animation: recordingPulse 1.5s infinite;
-        }
-
-        @keyframes recordingPulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 149, 0, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(255, 149, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 149, 0, 0); }
-        }
-
-        .send-btn {
-            width: auto;
-            padding: 0 30px;
-            border-radius: 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            letter-spacing: 2px;
-        }
-
-        /* Corner Decorations */
-        .corner {
-            position: fixed;
-            width: 50px;
-            height: 50px;
-            border: 2px solid var(--jarvis-blue);
-            z-index: 100;
-        }
-
-        .corner-tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-        .corner-tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-        .corner-bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-        .corner-br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
-
-        /* Command suggestions */
-        .suggestions {
-            position: absolute;
-            bottom: 140px;
-            left: 50%;
-            transform: translateX(-50%);
+        /* Controls */
+        .controls {
+            margin-top: 20px;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            justify-content: center;
-            max-width: 800px;
         }
 
-        .suggestion-chip {
-            padding: 8px 16px;
+        button {
             background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 20px;
-            font-size: 12px;
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
             transition: all 0.3s;
         }
 
-        .suggestion-chip:hover {
-            background: rgba(0, 212, 255, 0.3);
-            transform: translateY(-2px);
+        button:hover {
+            background: #00d4ff;
+            color: #000;
+            box-shadow: 0 0 20px #00d4ff;
         }
 
-        @media (max-width: 1200px) {
-            .hud-container {
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .manual-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 12px;
+            border-radius: 5px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .permission-granted {
+            color: #00ff88;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .permission-denied {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .container {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr auto;
+                grid-template-rows: 1fr auto;
             }
-            .left-panel, .right-panel {
+            .debug-panel {
                 max-height: 300px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Background -->
-    <canvas id="space-bg"></canvas>
-
-    <!-- Corners -->
-    <div class="corner corner-tl"></div>
-    <div class="corner corner-tr"></div>
-    <div class="corner corner-bl"></div>
-    <div class="corner corner-br"></div>
-
-    <!-- Main Interface -->
-    <div class="hud-container">
-        <!-- Top Bar -->
-        <div class="top-bar">
-            <div>
-                <div class="title">J.A.R.V.I.S.</div>
-                <div class="subtitle">Just A Rather Very Intelligent System</div>
+    <div class="container">
+        <div class="main-panel">
+            <div class="header">
+                <h1>J.A.R.V.I.S.</h1>
+                <div style="opacity: 0.7; font-size: 14px;">Voice Interface System // Debug Mode</div>
             </div>
-            <div class="system-status">
-                <div class="status-item">
-                    <div class="status-dot"></div>
-                    <span>ONLINE</span>
+
+            <div class="voice-core">
+                <div class="core-circle" id="coreCircle">
+                    <div class="mic-icon" id="micBtn" onclick="toggleVoice()">🎤</div>
                 </div>
-                <div class="status-item">
-                    <span id="clock">00:00:00</span>
+
+                <div class="status-text" id="statusText">Click microphone to test voice input</div>
+
+                <!-- Real-time Audio Visualizer -->
+                <div class="audio-levels" id="audioLevels">
+                    <!-- Generated by JS -->
                 </div>
-                <div class="status-item">
-                    <span id="date">DAY-MON-YEAR</span>
+
+                <div class="controls">
+                    <button onclick="testSpeech()">Test Synthesis</button>
+                    <button onclick="checkBrowser()">Check Browser</button>
+                    <button onclick="requestMic()">Request Mic Access</button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Left Panel -->
-        <div class="left-panel">
-            <div class="panel-title">SYSTEM DIAGNOSTICS</div>
-
-            <div class="metric">
-                <span>CPU Usage</span>
-                <span class="metric-value" id="cpu">12%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 12%"></div>
-            </div>
-
-            <div class="metric">
-                <span>Memory</span>
-                <span class="metric-value" id="memory">34%</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: 34%"></div>
-            </div>
-
-            <div class="metric">
-                <span>Network</span>
-                <span class="metric-value">OPTIMAL</span>
-            </div>
-
-            <div class="metric" style="margin-top: 20px;">
-                <span>Voice Rec</span>
-                <span class="metric-value" id="voice-status">STANDBY</span>
-            </div>
-
-            <div class="metric">
-                <span>Audio Out</span>
-                <span class="metric-value">ACTIVE</span>
-            </div>
-
-            <div style="margin-top: auto; font-size: 11px; opacity: 0.7; border-top: 1px solid rgba(0,212,255,0.2); padding-top: 10px;">
-                <div style="margin-bottom: 5px;">COMMANDS:</div>
-                <div>• "Hey JARVIS"</div>
-                <div>• "What's the time"</div>
-                <div>• "Open Google"</div>
-                <div>• "Calculate 5 x 5"</div>
-                <div>• "Weather"</div>
-            </div>
-        </div>
-
-        <!-- Center - Visualizer -->
-        <div class="center-panel">
-            <div class="wake-word-hint">Say "Hey JARVIS" to activate voice control</div>
-
-            <div class="visualizer-container">
-                <canvas id="audio-visualizer" width="400" height="400"></canvas>
-                <div class="core-ring" id="coreRing"></div>
-            </div>
-
-            <div class="listening-indicator" id="listeningIndicator">
-                LISTENING...
-            </div>
-        </div>
-
-        <!-- Right Panel - Chat (FIXED) -->
-        <div class="right-panel">
-            <div class="chat-header">
-                <span>INTERACTION LOG</span>
-                <span style="font-size: 10px; opacity: 0.7;">v2.0.1</span>
-            </div>
-
-            <div class="chat-messages" id="chatContainer">
-                <div class="message jarvis">
-                    <div>Welcome back, Sir. JARVIS online and ready.</div>
-                    <div class="message-time">SYSTEM BOOT</div>
+                <div class="manual-input">
+                    <input type="text" id="textInput" placeholder="Type command manually..." onkeypress="if(event.key==='Enter')processManual()">
+                    <button onclick="processManual()">Send</button>
                 </div>
             </div>
 
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
+            <div class="chat-area" id="chatArea">
+                <div class="message jarvis">System initialized. Click the microphone icon and speak, or type your command below.</div>
             </div>
         </div>
 
-        <!-- Bottom Bar -->
-        <div class="bottom-bar">
-            <button class="btn voice-btn" id="voiceBtn" onclick="toggleVoice()" title="Voice Command">
-                🎤
-            </button>
-
-            <input type="text" class="command-input" id="commandInput"
-                   placeholder="Enter command or speak..."
-                   onkeypress="handleKeyPress(event)">
-
-            <button class="btn send-btn" onclick="processCommand()">EXECUTE</button>
-        </div>
-
-        <!-- Command Suggestions -->
-        <div class="suggestions">
-            <div class="suggestion-chip" onclick="suggestCommand('What time is it?')">Time</div>
-            <div class="suggestion-chip" onclick="suggestCommand('Open YouTube')">YouTube</div>
-            <div class="suggestion-chip" onclick="suggestCommand('Calculate 125 * 4')">Calculate</div>
-            <div class="suggestion-chip" onclick="suggestCommand('Tell me a joke')">Joke</div>
-            <div class="suggestion-chip" onclick="suggestCommand('System status')">Status</div>
-            <div class="suggestion-chip" onclick="suggestCommand('Weather forecast')">Weather</div>
+        <div class="debug-panel">
+            <div class="debug-header">
+                <span>SYSTEM LOG</span>
+                <button onclick="clearLog()" style="padding: 5px 10px; font-size: 11px;">Clear</button>
+            </div>
+            <div class="debug-log" id="debugLog">
+                <div class="info">> System boot sequence initiated...</div>
+                <div class="info">> Waiting for user input...</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Clock
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour12: false});
-            document.getElementById('date').textContent = now.toLocaleDateString('en-US', {
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
-            }).toUpperCase();
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+        // Configuration
+        const config = {
+            wakeWord: false, // Set to true to require "Hey JARVIS"
+            continuous: false, // Set to true for always-listening mode
+            lang: 'en-US'
+        };
 
-        // Simulate system metrics
-        setInterval(() => {
-            document.getElementById('cpu').textContent = Math.floor(Math.random() * 30 + 10) + '%';
-            document.getElementById('memory').textContent = Math.floor(Math.random() * 20 + 30) + '%';
-        }, 3000);
-
-        // Three.js Background - Blue Particle Ring
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('space-bg'), alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-
-        // Create ring of particles
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particleCount = 2000;
-        const posArray = new Float32Array(particleCount * 3);
-
-        for(let i = 0; i < particleCount * 3; i += 3) {
-            // Create ring shape
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 20 + Math.random() * 10;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius * 0.3; // Flattened
-            const z = (Math.random() - 0.5) * 10;
-
-            posArray[i] = x;
-            posArray[i+1] = y;
-            posArray[i+2] = z;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.2,
-            color: 0x00d4ff,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-        camera.position.z = 50;
-
-        function animateBg() {
-            requestAnimationFrame(animateBg);
-            particlesMesh.rotation.y += 0.001;
-            particlesMesh.rotation.x += 0.0005;
-            renderer.render(scene, camera);
-        }
-        animateBg();
-
-        // Audio Visualizer
-        const visualizerCanvas = document.getElementById('audio-visualizer');
-        const vCtx = visualizerCanvas.getContext('2d');
-        let audioContext;
-        let analyser;
-        let dataArray;
-        let source;
-        let isVisualizing = false;
-
-        function initAudio() {
-            if (audioContext) return;
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-
-            // Create oscillator for visual feedback when speaking
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(analyser);
-            oscillator.start();
-            gainNode.gain.value = 0; // Silent but connected
-
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            isVisualizing = true;
-            drawVisualizer();
-        }
-
-        function drawVisualizer() {
-            if (!isVisualizing) return;
-            requestAnimationFrame(drawVisualizer);
-
-            vCtx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            vCtx.clearRect(0, 0, 400, 400);
-
-            const centerX = 200;
-            const centerY = 200;
-            const radius = 80;
-
-            // Draw frequency bars in circle
-            if (analyser && dataArray) {
-                analyser.getByteFrequencyData(dataArray);
-            } else {
-                // Fake data when not speaking
-                for (let i = 0; i < 64; i++) {
-                    dataArray[i] = Math.random() * 50;
-                }
-            }
-
-            const bars = 64;
-            const step = (Math.PI * 2) / bars;
-
-            for (let i = 0; i < bars; i++) {
-                const value = dataArray ? dataArray[i] : 0;
-                const barHeight = (value / 255) * 100;
-
-                const angle = i * step;
-                const x1 = centerX + Math.cos(angle) * radius;
-                const y1 = centerY + Math.sin(angle) * radius;
-                const x2 = centerX + Math.cos(angle) * (radius + barHeight);
-                const y2 = centerY + Math.sin(angle) * (radius + barHeight);
-
-                vCtx.strokeStyle = `hsl(${180 + (value / 255) * 60}, 100%, 50%)`;
-                vCtx.lineWidth = 2;
-                vCtx.beginPath();
-                vCtx.moveTo(x1, y1);
-                vCtx.lineTo(x2, y2);
-                vCtx.stroke();
-            }
-
-            // Center glow
-            const gradient = vCtx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-            gradient.addColorStop(0, 'rgba(0, 212, 255, 0.8)');
-            gradient.addColorStop(1, 'rgba(0, 212, 255, 0)');
-            vCtx.fillStyle = gradient;
-            vCtx.fillRect(0, 0, 400, 400);
-        }
-
-        // Speech Recognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+        // State
+        let recognition = null;
+        let synth = window.speechSynthesis;
         let isListening = false;
-        let silenceTimeout;
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let dataArray = null;
+        let animationId = null;
 
-        if (recognition) {
-            recognition.continuous = true;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
+        // Initialize
+        window.onload = () => {
+            createAudioBars();
+            checkBrowser();
+            initSpeechRecognition();
+            log('System ready. Click microphone to begin.', 'info');
+        };
 
-            recognition.onstart = () => {
-                isListening = true;
-                document.getElementById('voiceBtn').classList.add('recording');
-                document.getElementById('listeningIndicator').classList.add('active');
-                document.getElementById('voice-status').textContent = 'ACTIVE';
-                document.getElementById('coreRing').style.borderColor = '#ff9500';
-                initAudio();
-            };
+        function createAudioBars() {
+            const container = document.getElementById('audioLevels');
+            for(let i = 0; i < 20; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'level-bar';
+                bar.style.height = '5px';
+                container.appendChild(bar);
+            }
+        }
 
-            recognition.onend = () => {
-                isListening = false;
-                document.getElementById('voiceBtn').classList.remove('recording');
-                document.getElementById('listeningIndicator').classList.remove('active');
-                document.getElementById('voice-status').textContent = 'STANDBY';
-                document.getElementById('coreRing').style.borderColor = '#00d4ff';
-            };
+        function log(msg, type = 'info') {
+            const debugLog = document.getElementById('debugLog');
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `> ${msg}`;
+            debugLog.appendChild(div);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${msg}`);
+        }
 
-            recognition.onresult = (event) => {
-                const last = event.results.length - 1;
-                const command = event.results[last][0].transcript;
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+        }
 
-                // Check for wake word
-                if (command.toLowerCase().includes('jarvis') || command.toLowerCase().includes('hey')) {
-                    addMessage(command, 'user');
-                    processVoiceCommand(command);
+        // Check Browser Support
+        function checkBrowser() {
+            const chrome = /chrome/i.test(navigator.userAgent);
+            const edge = /edg/i.test(navigator.userAgent);
+
+            if (!chrome && !edge) {
+                log('WARNING: Speech Recognition requires Chrome or Edge browser', 'error');
+                updateStatus('Please use Chrome or Edge for voice features', 'error');
+                return false;
+            }
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                log('ERROR: Web Speech API not supported', 'error');
+                updateStatus('Browser does not support voice recognition', 'error');
+                return false;
+            }
+
+            log('Browser compatible: ' + navigator.userAgent, 'success');
+            return true;
+        }
+
+        // Initialize Speech Recognition
+        function initSpeechRecognition() {
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    log('Speech Recognition API unavailable', 'error');
+                    return;
                 }
-            };
 
-            recognition.onerror = (event) => {
-                console.error('Speech recognition error', event.error);
-            };
+                recognition = new SpeechRecognition();
+                recognition.continuous = config.continuous;
+                recognition.interimResults = false;
+                recognition.lang = config.lang;
+
+                recognition.onstart = () => {
+                    log('Voice recognition started', 'success');
+                    isListening = true;
+                    document.getElementById('micBtn').classList.add('recording');
+                    document.getElementById('coreCircle').classList.add('listening');
+                    updateStatus('Listening... Speak now', 'success');
+                    startAudioVisualizer();
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    log(`Heard: "${transcript}"`, 'info');
+
+                    // Add to chat
+                    addChat(transcript, 'user');
+
+                    // Process command
+                    processCommand(transcript);
+                };
+
+                recognition.onerror = (event) => {
+                    let errorMsg = '';
+                    switch(event.error) {
+                        case 'no-speech':
+                            errorMsg = 'No speech detected. Try speaking louder.';
+                            break;
+                        case 'audio-capture':
+                            errorMsg = 'No microphone found. Check hardware.';
+                            break;
+                        case 'not-allowed':
+                            errorMsg = 'Microphone permission denied. Click "Request Mic Access".';
+                            break;
+                        case 'network':
+                            errorMsg = 'Network error. Check connection.';
+                            break;
+                        default:
+                            errorMsg = `Error: ${event.error}`;
+                    }
+                    log(errorMsg, 'error');
+                    updateStatus(errorMsg, 'error');
+                    stopListening();
+                };
+
+                recognition.onend = () => {
+                    log('Voice recognition ended', 'info');
+                    stopListening();
+                };
+
+            } catch (e) {
+                log('Failed to init recognition: ' + e.message, 'error');
+            }
         }
 
         function toggleVoice() {
             if (!recognition) {
-                alert('Speech recognition not supported');
+                updateStatus('Voice recognition not available', 'error');
                 return;
             }
 
             if (isListening) {
+                stopListening();
                 recognition.stop();
             } else {
-                recognition.start();
-            }
-        }
-
-        // CRITICAL FIX: Auto-scroll function
-        function scrollToBottom() {
-            const container = document.getElementById('chatContainer');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        function addMessage(text, sender) {
-            const container = document.getElementById('chatContainer');
-            const div = document.createElement('div');
-            div.className = `message ${sender}`;
-
-            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            div.innerHTML = `<div>${text}</div><div class="message-time">${time}</div>`;
-
-            container.appendChild(div);
-
-            // CRITICAL: Scroll to bottom immediately
-            scrollToBottom();
-
-            // Also scroll after animation
-            setTimeout(scrollToBottom, 350);
-        }
-
-        function showTyping() {
-            document.getElementById('typingIndicator').classList.add('active');
-            scrollToBottom();
-        }
-
-        function hideTyping() {
-            document.getElementById('typingIndicator').classList.remove('active');
-        }
-
-        // JARVIS Brain
-        const jarvis = {
-            responses: {
-                greeting: ["At your service, Sir.", "Hello, Sir. How may I assist?", "JARVIS online. Awaiting commands."],
-                time: () => `The current time is ${new Date().toLocaleTimeString()}.`,
-                date: () => `Today is ${new Date().toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'})}.`,
-                joke: [
-                    "I tried to catch some fog earlier. Mist.",
-                    "I would tell you a UDP joke, but you might not get it.",
-                    "There are 10 types of people in the world: those who understand binary and those who don't.",
-                    "Why do programmers prefer dark mode? Because light attracts bugs."
-                ],
-                unknown: ["I'm not sure I understand, Sir.", "Could you elaborate on that?", "My apologies, I didn't catch that."]
-            },
-
-            commands: {
-                'time': () => speak(jarvis.responses.time()),
-                'date': () => speak(jarvis.responses.date()),
-                'weather': () => speak("Accessing weather satellites... Currently 72 degrees with clear skies in the workshop."),
-                'joke': () => speak(jarvis.responses.joke[Math.floor(Math.random() * jarvis.responses.joke.length)]),
-                'status': () => speak("All systems nominal. Power at 100%. Ready for deployment."),
-                'hello': () => speak(jarvis.responses.greeting[Math.floor(Math.random() * jarvis.responses.greeting.length)]),
-                'calculate': (cmd) => {
-                    try {
-                        const expr = cmd.replace(/[^0-9+\-*/().]/g, '');
-                        const result = eval(expr);
-                        speak(`The result is ${result}`);
-                    } catch {
-                        speak("I'm afraid I cannot compute that expression, Sir.");
-                    }
-                },
-                'open': (cmd) => {
-                    const sites = {
-                        'google': 'https://google.com',
-                        'youtube': 'https://youtube.com',
-                        'github': 'https://github.com',
-                        'netflix': 'https://netflix.com'
-                    };
-
-                    const site = Object.keys(sites).find(s => cmd.includes(s));
-                    if (site) {
-                        speak(`Opening ${site}, Sir.`);
-                        window.open(sites[site], '_blank');
-                    } else {
-                        speak("Which website would you like me to open, Sir?");
-                    }
-                },
-                'search': (cmd) => {
-                    const query = cmd.replace(/search for|search|find/gi, '').trim();
-                    speak(`Searching for ${query}`);
-                    window.open(`https://google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                try {
+                    recognition.start();
+                } catch (e) {
+                    log('Error starting: ' + e.message, 'error');
+                    updateStatus('Click "Request Mic Access" first', 'error');
                 }
             }
-        };
+        }
 
-        function processVoiceCommand(command) {
-            showTyping();
+        function stopListening() {
+            isListening = false;
+            document.getElementById('micBtn').classList.remove('recording');
+            document.getElementById('coreCircle').classList.remove('listening');
+            stopAudioVisualizer();
+            if (!isListening) updateStatus('Click microphone to speak', 'info');
+        }
+
+        // Request Microphone Permission explicitly
+        async function requestMic() {
+            try {
+                log('Requesting microphone permission...', 'info');
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                log('Microphone access granted!', 'success');
+                updateStatus('Microphone active. Click mic icon to speak.', 'success');
+
+                // Set up audio analysis for visualization
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                analyser.fftSize = 64;
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                // Keep stream alive
+                window.micStream = stream;
+
+            } catch (err) {
+                log('Microphone denied: ' + err.message, 'error');
+                updateStatus('Microphone blocked. Check browser permissions.', 'error');
+            }
+        }
+
+        // Audio Visualizer
+        function startAudioVisualizer() {
+            if (!analyser) {
+                // Simulate bars if no real mic
+                simulateAudio();
+                return;
+            }
+            animateAudio();
+        }
+
+        function animateAudio() {
+            if (!isListening) return;
+
+            analyser.getByteFrequencyData(dataArray);
+            const bars = document.querySelectorAll('.level-bar');
+
+            for(let i = 0; i < bars.length; i++) {
+                const value = dataArray[i] || 0;
+                const height = Math.max(5, (value / 255) * 60);
+                bars[i].style.height = height + 'px';
+                bars[i].classList.toggle('active', value > 100);
+            }
+
+            animationId = requestAnimationFrame(animateAudio);
+        }
+
+        function simulateAudio() {
+            const bars = document.querySelectorAll('.level-bar');
+            let frame = 0;
+
+            function animate() {
+                if (!isListening) return;
+                frame++;
+                bars.forEach((bar, i) => {
+                    const height = 5 + Math.sin(frame * 0.1 + i) * 20 + Math.random() * 15;
+                    bar.style.height = Math.max(5, height) + 'px';
+                });
+                animationId = requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        function stopAudioVisualizer() {
+            if (animationId) cancelAnimationFrame(animationId);
+            const bars = document.querySelectorAll('.level-bar');
+            bars.forEach(bar => {
+                bar.style.height = '5px';
+                bar.classList.remove('active');
+            });
+        }
+
+        // Process Commands
+        function processCommand(cmd) {
+            document.getElementById('coreCircle').classList.add('processing');
+            log('Processing: ' + cmd, 'info');
 
             setTimeout(() => {
-                hideTyping();
-                const cmd = command.toLowerCase();
-                let responded = false;
+                const response = generateResponse(cmd.toLowerCase());
+                speak(response);
+                document.getElementById('coreCircle').classList.remove('processing');
+            }, 500);
+        }
 
-                // Check commands
-                for (const [key, func] of Object.entries(jarvis.commands)) {
-                    if (cmd.includes(key)) {
-                        func(cmd);
-                        responded = true;
-                        break;
-                    }
+        function generateResponse(cmd) {
+            if (cmd.includes('time')) return `The current time is ${new Date().toLocaleTimeString()}.`;
+            if (cmd.includes('date')) return `Today is ${new Date().toLocaleDateString()}.`;
+            if (cmd.includes('hello') || cmd.includes('hi')) return 'Hello, Sir. JARVIS at your service.';
+            if (cmd.includes('weather')) return 'Accessing weather data... Clear skies, 72 degrees Fahrenheit.';
+            if (cmd.includes('joke')) return 'Why did the scarecrow win an award? He was outstanding in his field.';
+            if (cmd.includes('calculate')) {
+                try {
+                    const math = cmd.replace(/[^0-9+\-*/.]/g, '');
+                    const result = eval(math);
+                    return `The result is ${result}.`;
+                } catch {
+                    return 'I cannot compute that expression.';
                 }
+            }
+            if (cmd.includes('open google')) {
+                window.open('https://google.com', '_blank');
+                return 'Opening Google, Sir.';
+            }
+            if (cmd.includes('status')) return 'All systems nominal. Voice recognition active.';
 
-                if (!responded) {
-                    speak(jarvis.responses.unknown[Math.floor(Math.random() * jarvis.responses.unknown.length)]);
-                }
-            }, 1000);
+            return `I heard: "${cmd}". I'm still learning, but I understood you perfectly.`;
         }
 
-        function processCommand() {
-            const input = document.getElementById('commandInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            addMessage(text, 'user');
-            input.value = '';
-            processVoiceCommand(text);
-        }
-
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') processCommand();
-        }
-
-        function suggestCommand(cmd) {
-            document.getElementById('commandInput').value = cmd;
-            processCommand();
-        }
-
-        // Speech Synthesis with British accent preference
         function speak(text) {
-            if (!window.speechSynthesis) return;
+            if (!synth) {
+                addChat(text + ' (Speech synthesis unavailable)', 'jarvis');
+                return;
+            }
 
-            window.speechSynthesis.cancel();
-
+            synth.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.rate = 0.9;
-            utterance.pitch = 0.8;
-            utterance.volume = 1;
+            utterance.pitch = 0.9;
 
-            // Try to find British male voice
-            const voices = window.speechSynthesis.getVoices();
-            const britishVoice = voices.find(v => v.lang.includes('GB') && v.name.includes('Male')) ||
-                                voices.find(v => v.name.includes('Google UK English Male')) ||
-                                voices.find(v => v.name.includes('Daniel')) ||
-                                voices[0];
+            // Try to get British male voice
+            const voices = synth.getVoices();
+            const voice = voices.find(v => v.name.includes('Google UK English Male')) ||
+                         voices.find(v => v.name.includes('Daniel')) ||
+                         voices.find(v => v.lang.includes('GB') && v.name.includes('Male')) ||
+                         voices[0];
 
-            if (britishVoice) utterance.voice = britishVoice;
+            if (voice) utterance.voice = voice;
 
-            window.speechSynthesis.speak(utterance);
-            addMessage(text, 'jarvis');
+            utterance.onstart = () => {
+                log('Speaking: ' + text, 'info');
+                updateStatus('Speaking...', 'info');
+            };
+
+            utterance.onend = () => {
+                updateStatus('Ready', 'info');
+            };
+
+            synth.speak(utterance);
+            addChat(text, 'jarvis');
         }
 
-        // Initialize voices
-        window.speechSynthesis.onvoiceschanged = () => {
-            console.log('Voices loaded');
-        };
+        function addChat(text, sender) {
+            const chatArea = document.getElementById('chatArea');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.textContent = text;
+            chatArea.appendChild(div);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
 
-        // Resize handler
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        function processManual() {
+            const input = document.getElementById('textInput');
+            const text = input.value.trim();
+            if (!text) return;
+            addChat(text, 'user');
+            processCommand(text);
+            input.value = '';
+        }
 
-        // Initial greeting
-        setTimeout(() => {
-            speak("Good day, Sir. JARVIS has initialized successfully.");
-        }, 1500);
+        function updateStatus(text, type) {
+            const status = document.getElementById('statusText');
+            status.textContent = text;
+            status.className = 'status-text ' + type;
+        }
+
+        function testSpeech() {
+            speak('Voice synthesis test successful. JARVIS is online.');
+        }
+
+        // Load voices
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                const voices = speechSynthesis.getVoices();
+                log(`Loaded ${voices.length} voices`, 'info');
+            };
+        }
     </script>
 </body>
 </html>
